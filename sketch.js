@@ -18,6 +18,7 @@ class Map { // tạo bảng chơi
     this.ansy = [];
     this.check = [];
     this.stepx = [];
+    this.must = [];
     this.stepy = [];
     this.stepx.push(1);
     this.stepy.push(1);
@@ -45,6 +46,15 @@ class Map { // tạo bảng chơi
       }
     }
   }
+  choose() { // chọn các ô bắt buộc phải đi qua
+    for (let i = 0; i < this.ansx.length; i++) {
+      this.must.push(i);
+    }
+    this.must = shuffle(this.must);
+    for (let i = 0; i <= level; i++) {
+      this.visit[this.ansx[this.must[i]]][this.ansy[this.must[i]]] = 2;
+    }
+  }
   display() { // vẽ bảng chơi
     push();
     strokeWeight(2);
@@ -56,6 +66,12 @@ class Map { // tạo bảng chơi
     }
     for (let i = 1; i <= this.size; i++) {
       for (let j = 1; j <= this.size; j++) {
+        if (this.visit[i][j] == 2) {
+          push();
+          fill(100, 100, 0);
+          square((i - 1) * this.x, (j - 1) * this.y, this.x);
+          pop();
+        }
         if (this.check[i][j] == 1) {
           push();
           fill(100, 100, 100);
@@ -80,7 +96,14 @@ class Map { // tạo bảng chơi
     pop();
   }
   isWin() { // kiểm tra xem người chơi đã thắng hay chưa
-    return (this.px == this.size && this.py == this.size);
+    if (this.px == this.size && this.py == this.size) {
+      for (let i = 1; i <= this.size; i++) {
+        for (let j = 1; j <= this.size; j++) {
+          if (this.visit[i][j] == 2 && this.check[i][j] == 0) return false;
+        }
+      }
+      return true;
+    }
   }
   isLose() { // kiểm tra xem người chơi đã thua hay chưa
     if (task.time == 0) return true;
@@ -256,6 +279,7 @@ function mousePressed() { // các thao tác click chuột, chọn nước đi
     count = 1;
     mp = new Map;
     DFS(1, 1);
+    mp.choose();
   } else if (state == 3) { // khi game đang ở màn hình thua
     if (mouseY > 360 && mouseY < 390 && mouseX < 190 && mouseX > 105) state = 0;
     else if (mouseY > 360 && mouseY < 390 && mouseX > 250 && mouseX < 380) {
@@ -306,6 +330,7 @@ function mousePressed() { // các thao tác click chuột, chọn nước đi
       count = 1;
       mp = new Map;
       DFS(1, 1);
+      mp.choose();
     } else if (mouseX > 125 && mouseX < 370 && mouseY > 320 && mouseY < 365) { // đọc instruction
       state = 4;
     }
@@ -324,6 +349,7 @@ function mousePressed() { // các thao tác click chuột, chọn nước đi
       count = 1;
       mp = new Map;
       DFS(1, 1);
+      mp.choose();
     } else if (mouseX > 400 && mouseX < 500 && mouseY > 200 && mouseY < 400) { // người chơi quay trở về màn hình chính
       state = 0;
     }
@@ -408,7 +434,7 @@ function Instruction() { // chỉ dẫn
   textSize(25);
   text('10 Minh Ước:\n', 10, 30);
   textSize(15);
-  text('-Cho 1 bảng n*n, tìm 1 đường đi từ ô trên cùng bên trái đến ô dưới cùng\nbên phải sao cho các số trên đường đi tạo thành 1 dãy các số\n1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, ...', 10, 50);
+  text('-Cho 1 bảng n*n, tìm 1 đường đi từ ô trên cùng bên trái đến ô dưới cùng\nbên phải sao cho các số trên đường đi tạo thành 1 dãy các số\n1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, ..., đồng thời phải đi qua các ô màu vàng.', 10, 50);
   text('-Tại 1 vị trí, bạn có thể đi sang 8 vị trí xung quanh bằng cách click chuột\ntrái vào vị trí bạn muốn đến nhưng không được đi qua 1 ô 2 lần.', 10, 110);
   text('-Mỗi màn chơi sẽ cho bạn 100 điểm.', 10, 148);
   text('-Click chuột trái vào vị trí undo để dùng chức năng này.', 10, 168);
