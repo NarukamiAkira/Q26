@@ -47,7 +47,7 @@ class Map { // tạo bảng chơi
     }
   }
   choose() { // chọn các ô bắt buộc phải đi qua
-    for (let i = 0; i < this.ansx.length; i++) {
+    for (let i = 1; i < this.ansx.length-1; i++) {
       this.must.push(i);
     }
     this.must = shuffle(this.must);
